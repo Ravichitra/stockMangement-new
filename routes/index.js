@@ -376,16 +376,15 @@ router.post('/salesNew', function (req, res, next) {
 	var g=0;
 	
 	Stocks.find({name:req.body.medicineName,size:req.body.size},{stockid:1,quantity:1},{sort:{stockid:1}},function(err,data){
-	
-		if(!data){
+
+		if(data==null || data.length==0){
 			res.send({"Success":"stock Not Found!"});
 			
 		}else{
-			console.log(data.stockid);
+			
 			var quantityInForm=parseInt(req.body.Quantity)
 			for (const element of data) {
-				
-			
+				console.log(element.stockid);
 				if(quantityInForm<element.quantity)	{
 					 g=3;
 					Stocks.updateOne({stockid:element.stockid},{$set:{quantity:element.quantity-quantityInForm}},function(err,result){

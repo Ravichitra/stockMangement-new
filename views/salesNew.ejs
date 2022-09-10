@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="http://code.jquery.com/jquery-latest.min.js" type="text/javascript"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <%- include('partials/head'); %>
+    <script type="text/javascript">
+		$(document).ready(function(){
+
+			$( "#form" ).submit(function(event) {
+				event.preventDefault();
+
+				$.ajax({
+					type: 'POST',
+					url: '/salesNew',
+					data: $('#form').serialize(),
+					dataType: "json",
+					success: function(response){
+						//alert("a");
+						console.log(response.Success);
+						$('#form')[0].reset();
+
+						//document.getElementById("check").innerHTML=response.Success;
+         					//ADD THIS CODE
+         					setTimeout(function(){
+         						document.getElementById("check").innerHTML="";
+         					},3000);
+                             if (response.Success=="stock Not Found!") {
+                                alert("Entered Medicine not found");
+         						document.getElementById("aa").click();
+         					};
+                            if (response.Success=="sale Quantity is more than stock") {
+                                alert("Sale Quantity is more than stock quantity");
+         						document.getElementById("aa").click();
+         					};
+                             
+         					if (response.Success=="Success!") {
+                                //console.log(response.Success);
+         						document.getElementById("aa").click();
+         					};
+         				},
+         				error: function() {
+         				}
+         			})
+			});
+
+		});
+	</script>
+</head>
+<body class="container">
+
+<header>
+  <%- include('partials/header'); %>
+</header>
+
+<main>
+  <div class="jumbotron">
+    <h1>Medical stock Management Tool</h1>
+    <p>Maintain Medicine stocks easily using this tool</p>
+    <div class="col-md-4 col-md-offset-4">
+		<div>
+			<p>Enter sale Details</p>
+		</div>
+		<div class="form-group">
+			<form id="form" method="post" >
+				<input type="text" name="medicineName" placeholder="medicineName" required="" class="form-control"><br/>
+        <input type="text" name="size" placeholder="size in gram" required="" class="form-control"><br/>
+				<input type="text" name="Quantity" placeholder="Quantity" required="" class="form-control"><br/>
+				<input type="submit" value="sale" class="btn btn-success">
+			</form>
+		</div>
+		<div class="mssg bg-danger">
+			<span id="check" ></span>
+		</div>
+		<div id="LangTable"><a href="/salesNew" id="aa"></a>
+		</div>
+
+
+		</div>
+		
+	</div>
+    <div class="row">
+        <div class="col-lg-12">
+            <% var indexNum = 0; %>
+            <table class="table table-striped" id="mainTable">
+                <thead>
+                  <tr>
+                      <th>serial Number</th>
+                      <th>Sales Detail</th>
+                      <th>Sale Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                <% salesData.forEach(function(item){ %>
+                    
+                <tr>
+                    <td><%= item.salesId %></td>
+
+                    <td>
+                      <table class="table table-striped" id="innerTable">
+                         
+                            <tbody>
+                              
+                            <tr>
+                               
+                                <% item.saledMedicines.forEach(function(saledmed){ %>
+                                  <td><%= saledmed.name %></td>
+                                  <td><%= saledmed.size %></td>
+                                <td><%= saledmed.Quantity %></td>
+                            
+                            
+                            </tr>
+
+                                <% }) %>
+                              </tbody>
+                            </table>
+                    </td>
+                          <td><%= item.dateTime %></td>
+                        </tr>
+                        <% }) %>
+                          
+                
+                </tbody>
+            </table>
+        </div>
+    </div>
+  </div>
+ 
+</main>
+
+<footer>
+  <%- include('partials/footer'); %>
+</footer>
+
+</body>
+</html>

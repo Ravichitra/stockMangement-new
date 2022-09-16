@@ -232,7 +232,7 @@ router.post('/stock', function(req, res, next) {
 					
 
 				
-
+			
 
 
 
@@ -420,10 +420,11 @@ router.post('/salesNew', function (req, res, next) {
 			});
 			
 			break; 
-		} 
-				
+		} }
+				if(g!=3)
+				res.send({"Success":"sale Quantity is more than stock"});
 					
-	}	
+		
 	
 
 				

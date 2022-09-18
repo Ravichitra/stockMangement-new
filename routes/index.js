@@ -191,10 +191,6 @@ router.post('/stock', function(req, res, next) {
 	res.send();
 	} else {
 
-
-
-
-		
 				var c;
 				Stocks.findOne({},function(err,data){
 
@@ -231,128 +227,7 @@ router.post('/stock', function(req, res, next) {
 
 					
 
-				
-			
 
-
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-		
 
 router.get('/salesNew', function (req, res, next) {console.log('dsgu');
 User.findOne({unique_id:req.session.userId},function(err,data){
@@ -429,13 +304,26 @@ router.post('/salesNew', function (req, res, next) {
 
 				
 	}
+      });
+	
 });
 
-	
+router.get('/expiry', function (req, res, next) {console.log('dsgu');
+User.findOne({unique_id:req.session.userId},function(err,data){
+	console.log("data");
+	// console.log(data);
+	if(!data){
+	res.redirect('/');
+	}else{
+		var query = { expirydate: {$lte:new Date()} };
+	Stocks.find(query,{},{sort:{expirydate:-1}},function(err,data){
 		
-	
-			
+	return res.render('expiry.ejs',{"name":data.username,"email":data.email,"expiryData":data});
 		});
+		
+	}
+});
+});
 	    
 
 /* router.post('/salesNew', function (req, res, next) {

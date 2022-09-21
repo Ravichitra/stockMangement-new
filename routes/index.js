@@ -192,7 +192,7 @@ router.post('/stock', function(req, res, next) {
 	} else {
 
 				var c;
-				Stocks.findOne({},function(err,data){
+				Stocks.findOne({},{stockid:1},{sort:{stockid:-1}},function(err,data){
 
 					if (data) {
 						console.log("if");
@@ -230,6 +230,7 @@ router.post('/stock', function(req, res, next) {
 
 
 router.get('/salesNew', function (req, res, next) {console.log('dsgu');
+
 User.findOne({unique_id:req.session.userId},function(err,data){
 	console.log("data");
 	// console.log(data);
@@ -249,18 +250,74 @@ User.findOne({unique_id:req.session.userId},function(err,data){
 
 router.post('/salesNew', function (req, res, next) {
 	var g=0;
-	
+	var arr=[];
+			var lst=[];
+
+	var query = { expirydate: {$lte:new Date()} };
+			async function my(){		
+				await Stocks.find(query,{},{sort:{expirydate:-1}},function(err,risk){
+					
+						for (var i = 0;i<risk.length;i++){
+							console.log("is tis come",risk.length);
+				
+							arr[i]=risk[i].stockid;
+							console.log(arr[i]);
+						}
+						});
+					}
+		async function test(){				
+			await my();
 	Stocks.find({name:req.body.medicineName,size:req.body.size},{stockid:1,quantity:1},{sort:{stockid:1}},function(err,data){
 
 		if(data==null || data.length==0){
 			res.send({"Success":"stock Not Found!"});
 			
-		}else{
+		}
+		
+		else{
 			
+					
+					
+						for (const element of data) {
+							console.log(arr[1]);
+							console.log(element.stockid);
+						if(arr.includes(element.stockid)){
+							var b=2;
+						
+						}
+					else{
+						var c=3;
+						console.log("hi");
+						lst.push(element.stockid);
+
+					}
+					}
+					if(c==3){
+		console.log(c);
 			var quantityInForm=parseInt(req.body.Quantity)
 			for (const element of data) {
 				console.log(element.stockid);
-				if(quantityInForm<element.quantity)	{
+
+				
+				
+				
+				
+				
+			
+
+
+
+
+
+
+
+
+
+
+if(lst.includes(element.stockid)){
+	console.log(c);
+				if(quantityInForm<=element.quantity)	{
+					console.log(c);
 					 g=3;
 					Stocks.updateOne({stockid:element.stockid},{$set:{quantity:element.quantity-quantityInForm}},function(err,result){
 						if(err)
@@ -295,18 +352,49 @@ router.post('/salesNew', function (req, res, next) {
 			});
 			
 			break; 
-		} }
-				if(g!=3)
-				res.send({"Success":"sale Quantity is more than stock"});
-					
-		
+		} }}
+		if(g!=3){
+			b=8
+		res.send({"Success":"sale Quantity is more than stock"});
+		}
 	
-
 				
-	}
-      });
+			
 	
+	}
+	if(c!=3){
+		res.send({"Success":"stock expired"});
+	}
+				
+		}
+      });
+		}
+		test();
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 router.get('/expiry', function (req, res, next) {console.log('dsgu');
 User.findOne({unique_id:req.session.userId},function(err,data){
@@ -318,11 +406,19 @@ User.findOne({unique_id:req.session.userId},function(err,data){
 		var query = { expirydate: {$lte:new Date()} };
 	Stocks.find(query,{},{sort:{expirydate:-1}},function(err,data){
 		
+		console.log(data);
+		var arr2 = [];
+		for (var i = 0;i<data.length;i++){
+			
+			  arr2[i]=data[i].stockid;
+			  console.log(arr2[i]);
+			}
 	return res.render('expiry.ejs',{"name":data.username,"email":data.email,"expiryData":data});
 		});
 		
 	}
 });
+		
 });
 	    
 

@@ -33,6 +33,10 @@
                                 alert("Sale Quantity is more than stock quantity");
          						document.getElementById("aa").click();
          					};
+                   if (response.Success=="stock expired") {
+                                alert("Medicine expired");
+         						document.getElementById("aa").click();
+         					};
                              
          					if (response.Success=="Success!") {
                                 //console.log(response.Success);

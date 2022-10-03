@@ -16,6 +16,17 @@
   <div class="jumbotron">
     <h1>Medical stock Management Tool</h1>
     <p>Maintain Medicine stocks easily using this tool</p>
+    <br>
+    <br>
+    <h3>Alerts:</h3>
+    <h5>Medicine Expiring in Next 3 Days</h5>
+    <ul>
+    <% alertData.expiredData.forEach(function(item){ %>
+      <li>
+      <%= item.name %> : <%= item.expirydate %>  <br>
+    </li>
+      <% }) %>
+    </ul>
   </div>
  
 </main>

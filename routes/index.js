@@ -105,8 +105,19 @@ router.get('/home', function (req, res, next) {
 		if(!data){
 			res.redirect('/');
 		}else{
-			//console.log("found");
-			return res.render('home.ejs', {"name":data.username,"email":data.email});
+			console.log("found");
+			var currentDate= new Date();
+			var twoDayAfter= new Date();
+			twoDayAfter.setDate(twoDayAfter.getDate()+3)
+			console.log("currentDate:"+currentDate+"twoDayAfter:"+twoDayAfter);
+			var query = { expirydate: {$gte:currentDate,$lte:twoDayAfter} };
+			Stocks.find(query,{},{sort:{expirydate:-1}},function(err,data){
+				var alertData={};
+				alertData.expiredData=data;
+				console.log("expired"+alertData.expiredData);
+
+				return res.render('home.ejs', {"name":data.username,"email":data.email,"alertData":alertData});
+				});
 		}
 	});
 });
@@ -298,21 +309,6 @@ router.post('/salesNew', function (req, res, next) {
 			for (const element of data) {
 				console.log(element.stockid);
 
-				
-				
-				
-				
-				
-			
-
-
-
-
-
-
-
-
-
 
 if(lst.includes(element.stockid)){
 	console.log(c);
@@ -324,9 +320,7 @@ if(lst.includes(element.stockid)){
 					console.log(err);
 					else
 					console.log(result);
-				
-					
-					
+
 					})
 			var saledMedicine=[];
 			var salesId=(new Date()).getTime().toString(36);
@@ -371,30 +365,6 @@ if(lst.includes(element.stockid)){
 		}
 		test();
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 router.get('/expiry', function (req, res, next) {console.log('dsgu');
 User.findOne({unique_id:req.session.userId},function(err,data){

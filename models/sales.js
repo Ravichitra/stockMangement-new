@@ -4,12 +4,12 @@ var Schema = mongoose.Schema;
 salesSchema = new Schema( {
 	
 	salesId: String,
-	dateTime: String,
+	dateTime: Date,
 	saledMedicines: [
 		{
 			name:String,
 			size:String,
-			Quantity:Number
+			quantity:Number
 		}
 	]
 }),

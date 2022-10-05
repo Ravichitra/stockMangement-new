@@ -3,6 +3,8 @@ var router = express.Router();
 var User = require('../models/user');
 var Sales = require('../models/sales');
 var Stocks = require('../models/stock');
+var json2csv = require('json2csv');
+var { Parser } = require('json2csv')
 
 router.get('/', function (req, res, next) {
 	return res.render('index.ejs');
@@ -221,7 +223,8 @@ router.post('/stock', function(req, res, next) {
 						size: stockInfo.size,
 						category: stockInfo.category,
 						quantity:stockInfo.quantity,
-						expirydate:stockInfo.expirydate
+						expirydate:stockInfo.expirydate,
+						insertedDate: new Date()
 						});
 						
 						newStock.save(function(err){
@@ -390,51 +393,111 @@ User.findOne({unique_id:req.session.userId},function(err,data){
 });
 		
 });
-	    
 
-/* router.post('/salesNew', function (req, res, next) {
-	Stocks.findOne({name:req.body.medicineName,size:req.body.size},function(err,data){
-	
-		if(!data){
-			res.send({"Success":"stock Not Found!"});
-		}else{
-			var quantityInForm=parseInt(req.body.Quantity)
-	       if(quantityInForm>data.quantity)	{
-		    res.send({"Success":"sale Quantity is more than stock"});
-	       }
-		   else {
-	var saledMedicine=[];
-	var salesId=(new Date()).getTime().toString(36);
 
-	saledMedicine.push({name:req.body.medicineName,size:req.body.size,Quantity:req.body.Quantity})
-	
 
-	var newSale = new Sales({ salesId: salesId, 
-		saledMedicines: saledMedicine,
-	    dateTime: new Date()
-	 });
-	 data.quantity=data.quantity-req.body.Quantity;
-	 data.save(function(err, Person){
-		 if(err)
-			 console.log(err);
-		 else
-			 console.log('quantity subtracted');
-	 });
-	newSale.save(function(err){
-		if(err)
-			console.log(err);
-		else {
-			console.log('Index Success');
-			res.send({"Success":"Success!"});
-		}
-			
-	});
-}
+
+router.get('/report', function (req, res, next) {console.log('report');
+User.findOne({unique_id:req.session.userId},function(err,data){
+console.log("data");
+// console.log(data);
+if(!data){
+res.redirect('/');
+}else{
+//console.log("found");
+var emptyData={};
+return res.render('report.ejs',{"name":data.username,"email":data.email});
+/* Stocks.find({},function(err,data){
+return res.render('report.ejs',{"name":data.username,"email":data.email,stockdata:data});
+}); */
 }
 });
+
 });
 
-*/
+router.post('/report', function(req, res, next) {
+	console.log("inside report post:1");
+	console.log(req.body);
+	var reportRequest = req.body;
+	//res.send({"Success":"Stock added."});
+/* 	Stocks.find({},function(err,data){
+		console.log("inside report post:1");
+		res.send(data);
+		//return res.render('report.ejs',{"name":data.username,"email":data.email,stockdata:data});
+		}); */
+		//res.send(data);
+	if(reportRequest){
+		console.log('here it comes-report');
+			Stocks.find({},function(err,mongoData){
+		console.log("inside report post:1");
+
+
+
+const fields = [{
+	label: 'name',
+	value: 'name'
+}, {
+	label: 'size',
+	value: 'size'
+},
+{
+	label: 'quantity',
+	value: 'quantity'
+}]
+
+const json2csv = new Parser({ fields: fields })
+
+try {
+	const csv = json2csv.parse(mongoData)
+	res.attachment('data.csv')
+	res.status(200).send(csv)
+} catch (error) {
+	console.log('error:', error.message)
+	res.status(500).send(error.message)
+}
+		//</your>res.send(data);
+		//res.render('report.ejs',{"name":data.username,"email":data.email,stockdata:data});
+		}); 
+	
+	//res.send();
+	} else {
+
+				var c;
+				Stocks.findOne({},{stockid:1},{sort:{stockid:-1}},function(err,data){
+
+					if (data) {
+						console.log("if");
+						c = data.stockid + 1;
+					
+					}else{
+						c=1;
+						
+					}
+
+					var newStock = new Stocks({
+						stockid:c,
+						
+						name: stockInfo.medicine_name,
+						size: stockInfo.size,
+						category: stockInfo.category,
+						quantity:stockInfo.quantity,
+						expirydate:stockInfo.expirydate,
+						insertedDate: new Date()
+						});
+						
+						newStock.save(function(err){
+						if(err)
+						console.log(err);
+						else
+						console.log('Success');
+						});
+						res.send({"Success":"Stock added."});
+						}
+						);
+					}
+				});
+
+	
 
 
 module.exports = router;

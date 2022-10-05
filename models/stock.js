@@ -9,7 +9,8 @@ stockSchema = new Schema( {
 	size:String,
 	category: String,
 	quantity:Number,
-	expirydate:Date
+	expirydate:Date,
+	insertedDate:Date
 }),
 Stocks = mongoose.model('stock', stockSchema);
 

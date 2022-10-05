@@ -8,25 +8,28 @@
     <script type="text/javascript">
 		$(document).ready(function(){
 
-            $( "#form2" ).submit(function(event) {
+            $( "#form3" ).submit(function(event) {
             event.preventDefault();
 
                 $.ajax({
             type: 'POST',
-            url: '/stock',
-            data: $('#form2').serialize(),
+            url: '/report',
+            data: $('#form3').serialize(),
             dataType: "json",
         
         success: function(response){
             //alert("a");
-        console.log(response.Success);
-            $('#form2')[0].reset();
+            console.log("inside report post:2");
+            var stockdata=response;
+       
+        document.getElementById("aa1").click();
+            $('#form3')[0].reset();
 
-            
+            /* 
                  if (response.Success=="Stock added.") {
                     console.log('data entered');
                      document.getElementById("aa").click();
-                 };
+                 }; */
              },
              error: function() {
                
@@ -45,34 +48,31 @@
 <main>
   <div class="jumbotron">
     <h1>Medical stock Management Tool</h1>
-    <p>Maintain Medicine stocks easily using this tool</p>
+    <p>Get Stock and Sales Report</p>
     <div class="col-md-4 col-md-offset-4">
-		<div>
-			<p>Add Medicine</p>
-		</div>
+
 		<div class="form-group">
-			<form id="form2" method="post" >
-				<input type="text" name="medicine_name" placeholder="medicineName" required="" class="form-control"><br/>
-                <input type="text" name="size" placeholder="size in gram" required="" class="form-control"><br/>
-                <label for="category">Choose a category:</label>
+			<form id="form3" method="post" >
+
+                <label for="category">Choose a Report Type:</label>
 
 <select name="category" required class="form-control">
-  <option value="tablet">tablet</option>
-  <option value="sryup">sryup</option>
-  <option value="oilment">oilment</option>
-  <option value="capsule">capsule</option>
+  <option value="stock">Stock Added</option>
+  <option value="sales">Sales</option>
 </select><br/>
-				<input type="text" name="quantity" placeholder="Quantity" required="" class="form-control"><br/>
-        <label for="expirydate">Expiry Date:</label>
-        <input type="date"  name="expirydate" placeholder="Expiry date" required="" class="form-control" ><br/>
-
-				<input type="submit" value="Create" class="btn btn-success">
+        <label >Select Date Range:</label>
+        <br>
+        <label for="fromDate">From Date:</label>
+        <input type="date"  name="fromDate" placeholder="From date" required="" class="form-control" ><br/>
+        <label for="endDate">End Date:</label>
+        <input type="date"  name="endDate" placeholder="End date" required="" class="form-control" ><br/>
+				<input type="submit" value="Get Report" class="btn btn-success">
 			</form>
 		</div>
 		<div class="mssg bg-danger">
 			<span id="check" ></span>
 		</div>
-		<div id="LangTable"><a href="/stock" id="aa"></a>
+		<div id="LangTable"><a href="/report" id="aa1"></a>
 		</div>
 
 
@@ -94,6 +94,7 @@
                   </tr>
                 </thead>
                 <tbody>
+                    <% if(typeof stockdata == 'object' && stockdata) { %>
                 <% stockdata.forEach(function(item){ %>
                     
                 <tr>
@@ -105,6 +106,7 @@
                     
                 </tr>
                 <% }) %>
+                <% } %>
                 </tbody>
             </table>
         </div>

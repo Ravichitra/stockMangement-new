@@ -23,7 +23,7 @@
             var stockdata=response;
        
         document.getElementById("aa1").click();
-            $('#form3')[0].reset();
+            
 
             /* 
                  if (response.Success=="Stock added.") {
@@ -88,20 +88,18 @@
                      
                       <th>Medicine Name</th>
                       <th>size in grams</th>
-                      <th>Category</th>
                       <th>Quantity</th>
                       
                   </tr>
                 </thead>
                 <tbody>
-                    <% if(typeof stockdata == 'object' && stockdata) { %>
-                <% stockdata.forEach(function(item){ %>
+                    <% if(typeof reportData == 'object' && reportData) { %>
+                <% reportData.forEach(function(item){ %>
                     
                 <tr>
                     
                     <td><%= item.name %></td>
                     <td><%= item.size %></td>
-                    <td><%= item.category %></td>
                     <td><%= item.quantity %></td>
                     
                 </tr>

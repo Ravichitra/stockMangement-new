@@ -5,6 +5,7 @@ var Sales = require('../models/sales');
 var Stocks = require('../models/stock');
 var json2csv = require('json2csv');
 var { Parser } = require('json2csv')
+var reportGlobal={};
 
 router.get('/', function (req, res, next) {
 	return res.render('index.ejs');
@@ -328,7 +329,7 @@ if(lst.includes(element.stockid)){
 			var saledMedicine=[];
 			var salesId=(new Date()).getTime().toString(36);
 		
-			saledMedicine.push({name:req.body.medicineName,size:req.body.size,Quantity:req.body.Quantity});
+			saledMedicine.push({name:req.body.medicineName,size:req.body.size,quantity:req.body.Quantity});
 			
 		console.log("here");
 			var newSale = new Sales({ salesId: salesId, 
@@ -406,10 +407,38 @@ res.redirect('/');
 }else{
 //console.log("found");
 var emptyData={};
-return res.render('report.ejs',{"name":data.username,"email":data.email});
-/* Stocks.find({},function(err,data){
-return res.render('report.ejs',{"name":data.username,"email":data.email,stockdata:data});
-}); */
+console.log("get report"+reportGlobal.fromDate);
+if(reportGlobal.fromDate && reportGlobal.toDate) {
+	var localFromDate=reportGlobal.fromDate;
+	var localEndDate=reportGlobal.toDate;
+	reportGlobal.fromDate=null;
+	reportGlobal.toDate=null;
+	
+	console.log("get report inside if"+localFromDate+"reportType:"+reportGlobal.reportType);
+	if(reportGlobal.reportType=="stock") {
+		reportGlobal.reportType=null;
+	var query = { insertedDate: {$gte:localFromDate,$lte:localEndDate} };
+	Stocks.find(query,{},{sort:{expirydate:-1}},function(err,data){
+    return res.render('report.ejs',{"name":data.username,"email":data.email,reportData:data});
+}); 
+	} else if(reportGlobal.reportType=="sales") {
+		reportGlobal.reportType=null;
+		var query = { dateTime: {$gte:localFromDate,$lte:localEndDate} };
+		Sales.find(query,{},{sort:{dateTime:-1}},function(err,data){
+			console.log(data);
+			var saledMedicinelst=[]
+			for (const element of data) {
+				saledMedicinelst=saledMedicinelst.concat(element.saledMedicines);
+			}
+			console.log(saledMedicinelst);
+	return res.render('report.ejs',{"name":data.username,"email":data.email,reportData:saledMedicinelst});
+	}); 
+	}
+}
+else {
+	return res.render('report.ejs',{"name":data.username,"email":data.email});
+}
+
 }
 });
 
@@ -419,6 +448,11 @@ router.post('/report', function(req, res, next) {
 	console.log("inside report post:1");
 	console.log(req.body);
 	var reportRequest = req.body;
+	console.log("post report"+reportGlobal.fromDate);
+	reportGlobal.fromDate=reportRequest.fromDate;
+	reportGlobal.toDate=reportRequest.endDate;
+	reportGlobal.reportType=reportRequest.category;
+	console.log("post report"+reportGlobal.fromDate);
 	//res.send({"Success":"Stock added."});
 /* 	Stocks.find({},function(err,data){
 		console.log("inside report post:1");
@@ -428,38 +462,11 @@ router.post('/report', function(req, res, next) {
 		//res.send(data);
 	if(reportRequest){
 		console.log('here it comes-report');
-			Stocks.find({},function(err,mongoData){
-		console.log("inside report post:1");
+		
 
 
-
-const fields = [{
-	label: 'name',
-	value: 'name'
-}, {
-	label: 'size',
-	value: 'size'
-},
-{
-	label: 'quantity',
-	value: 'quantity'
-}]
-
-const json2csv = new Parser({ fields: fields })
-
-try {
-	const csv = json2csv.parse(mongoData)
-	res.attachment('data.csv')
-	res.status(200).send(csv)
-} catch (error) {
-	console.log('error:', error.message)
-	res.status(500).send(error.message)
-}
-		//</your>res.send(data);
-		//res.render('report.ejs',{"name":data.username,"email":data.email,stockdata:data});
-		}); 
 	
-	//res.send();
+	res.send({"Success":"Stock added."});
 	} else {
 
 				var c;

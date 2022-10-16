@@ -4,7 +4,8 @@ var User = require('../models/user');
 var Sales = require('../models/sales');
 var Stocks = require('../models/stock');
 var json2csv = require('json2csv');
-var { Parser } = require('json2csv')
+var { Parser } = require('json2csv');
+const e = require('express');
 var reportGlobal={};
 
 router.get('/', function (req, res, next) {
@@ -114,13 +115,33 @@ router.get('/home', function (req, res, next) {
 			twoDayAfter.setDate(twoDayAfter.getDate()+3)
 			console.log("currentDate:"+currentDate+"twoDayAfter:"+twoDayAfter);
 			var query = { expirydate: {$gte:currentDate,$lte:twoDayAfter} };
+			var alertData={};
 			Stocks.find(query,{},{sort:{expirydate:-1}},function(err,data){
-				var alertData={};
 				alertData.expiredData=data;
 				console.log("expired"+alertData.expiredData);
-
+				
+				Stocks.find({},function(err,data){
+					const stockDataQua = new Map();
+					for (let item of data) {
+							if(stockDataQua.has(item.name)) {
+								var updatedQuantity=stockDataQua.get(item.name) +item.quantity;
+								stockDataQua.set(item.name,updatedQuantity);
+							}
+							else {
+								stockDataQua.set(item.name,item.quantity);
+							}
+					}
+					var lowStockData=[];	
+					for (const entry of stockDataQua) {
+						if(entry[1]<10) {
+							lowStockData.push({name:entry[0],Quantity:entry[1]});	
+						}
+					  }
+					alertData.lowStockData=lowStockData;
 				return res.render('home.ejs', {"name":data.username,"email":data.email,"alertData":alertData});
 				});
+				
+			});
 		}
 	});
 });

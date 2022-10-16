@@ -123,6 +123,7 @@ router.get('/home', function (req, res, next) {
 				Stocks.find({},function(err,data){
 					const stockDataQua = new Map();
 					for (let item of data) {
+						if(item.expirydate>new Date()) {
 							if(stockDataQua.has(item.name)) {
 								var updatedQuantity=stockDataQua.get(item.name) +item.quantity;
 								stockDataQua.set(item.name,updatedQuantity);
@@ -130,9 +131,11 @@ router.get('/home', function (req, res, next) {
 							else {
 								stockDataQua.set(item.name,item.quantity);
 							}
+						}
 					}
 					var lowStockData=[];	
 					for (const entry of stockDataQua) {
+						console.log(entry[0]+':'+entry[1]);
 						if(entry[1]<10) {
 							lowStockData.push({name:entry[0],Quantity:entry[1]});	
 						}

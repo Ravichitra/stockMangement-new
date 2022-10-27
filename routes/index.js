@@ -6,6 +6,8 @@ var Stocks = require('../models/stock');
 var json2csv = require('json2csv');
 var { Parser } = require('json2csv');
 const e = require('express');
+const { Query } = require('mongoose');
+const { json } = require('express');
 var reportGlobal={};
 
 router.get('/', function (req, res, next) {
@@ -207,7 +209,7 @@ res.redirect('/');
 
 
 
-Stocks.find({},function(err,data){
+Stocks.find({},{_id:0},function(err,data){
 return res.render('stock.ejs',{"name":data.username,"email":data.email,stockdata:data});
 });
 }
@@ -286,6 +288,22 @@ User.findOne({unique_id:req.session.userId},function(err,data){
 });
 });
 
+router.post('/deletestock', function (req, res, next) {
+	console.log('deletestock whole body'+JSON.stringify(req.body) );
+	console.log('deletestock'+req.body.stockid);
+	var query = { stockid:req.body.stockid };
+	Stocks.deleteOne(query,function(err,risk){
+	});
+});
+
+router.post('/updatestock', function (req, res, next) {
+	console.log('updatedstock whole body'+JSON.stringify(req.body) );
+	console.log('deletestock'+req.body.stockid);
+	const options = { upsert: true };
+	var query = { stockid:req.body.stockid };
+	Stocks.updateOne(query,req.body,options,function(err,risk){
+	});	
+});
 
 router.post('/salesNew', function (req, res, next) {
 	var g=0;
